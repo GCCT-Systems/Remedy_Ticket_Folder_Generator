@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardar Datos en Archivo Markdown</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+<script>
+function createZip() {
+    // Get form data
+    var data = {
+        title: "# REMEDY FOLDER TICKET GENERATOR\n\n",
+        name: document.getElementById('name').value,
+        summary: document.getElementById('summary').value,
+        tasStart: document.getElementById('tasStart').value,
+        tasStartTime: document.getElementById('tasStartTime').value,
+        tas: document.getElementById('tas').value,
+        message: document.getElementById('message').value
+    };
+
+    // Extract date and time from summary using regex
+    var regex = /(\d{4}\/\d{2}\/\d{2}\s)(\d{2}:\d{2}:\d{2})/;
+    var summary = data.summary.replace(regex, '');
+    var summaryDateTimeMatch = data.summary.match(regex);
+    var tasStartDate = summaryDateTimeMatch ? summaryDateTimeMatch[1] : data.tasStart;
+    var tasStartTime = summaryDateTimeMatch ? summaryDateTimeMatch[2] : data.tasStartTime;
+
+    // Format data as Markdown
+    var markdownData = `${data.title}### Información del Ticket\n\n**Nombre:** ${data.name}\n**Fecha Inicio TAS:** ${tasStartDate}\n**Hora Inicio TAS:** ${tasStartTime}\n**Summary:** ${summary.trim()}\n**TAS:** ${data.tas}\n\n---\n\n**Mensaje:**\n${data.message}`;
+
+    // Create a new JSZip instance
+    var zip = new JSZip();
+
+    // Create a folder
+    var folder = zip.folder(`${data.tas}`);
+
+    // Add Markdown file to the folder
+    folder.file(`${data.tas}.md`, markdownData);
+
+    // Generate the zip file asynchronously
+    zip.generateAsync({type:"blob"})
+    .then(function(content) {
+        // Create a link element
+        var a = document.createElement("a");
+
+        // Set link's attributes including the file name
+        a.download = `${tasStartDate}_${data.tas}.zip`;
+        a.href = window.URL.createObjectURL(content);
+
+        // Append the link to the body
+        document.body.appendChild(a);
+
+        // Click the link to trigger the download
+        a.click();
+
+        // Cleanup
+        document.body.removeChild(a);
+    });
+}
+
+function extractTASDateTime() {
+    var summary = document.getElementById('summary').value;
+    var regex = /(\d{4}\/\d{2}\/\d{2}\s)(\d{2}:\d{2}:\d{2})/;
+    var summaryDateTimeMatch = summary.match(regex);
+    if (summaryDateTimeMatch) {
+        document.getElementById('tasStart').value = summaryDateTimeMatch[1];
+        document.getElementById('tasStartTime').value = summaryDateTimeMatch[2];
+    }
+}
+
+function autoFillTASPrefix() {
+    var tasInput = document.getElementById('tas').value;
+    var tasPrefix = tasInput.substring(0, 3).toUpperCase();
+    if (tasPrefix === 'TAS' || tasPrefix === 'CRQ' || tasPrefix === 'WO' || tasPrefix === 'INC') {
+        document.getElementById('tasPrefix').value = tasPrefix;
+    } else {
+        document.getElementById('tasPrefix').value = '';
+    }
+}
+</script>
+</head>
+<body>
+<h1>Remedy Folder TICKET GENERATOR:</h1>
+<form id="dataForm">
+    <label for="name">Nombre:</label><br>
+    <input type="text" id="name" name="name" required><br>
+    <label for="summary">Summary:</label><br>
+    <textarea id="summary" name="summary" onchange="extractTASDateTime()" required></textarea><br>
+    <label for="tasStart">Fecha Inicio TAS (Opcional):</label><br>
+    <input type="date" id="tasStart" name="tasStart"><br>
+    <label for="tasStartTime">Hora Inicio TAS (Opcional):</label><br>
+    <input type="time" id="tasStartTime" name="tasStartTime"><br>
+    <label for="tas">TAS:</label><br>
+    <input type="text" id="tas" name="tas" onchange="autoFillTASPrefix()"><br>
+    <label for="tasPrefix">Prefijo TAS:</label><br>
+    <select id="tasPrefix" name="tasPrefix">
+        <option value="">Seleccionar</option>
+        <option value="TAS">TAS</option>
+        <option value="CRQ">CRQ</option>
+        <option value="WO">WO</option>
+        <option value="INC">INC</option>
+    </select><br>
+    <label for="message">Mensaje:</label><br>
+    <textarea id="message" name="message"></textarea><br><br>
+    <input type="button" value="Enviar" onclick="createZip()">
+</form>
+
+</body>
+</html>
