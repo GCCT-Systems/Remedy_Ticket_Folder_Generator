@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guardar Datos en Archivo Markdown</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
 function createZip() {
     // Get form data
@@ -19,14 +23,13 @@ function createZip() {
     };
 
     // Extract date and time from summary using regex
-    var regex = /(\d{4}\/\d{2}\/\d{2}\s)(\d{2}:\d{2}:\d{2})/;
-    var summary = data.summary.replace(regex, '');
+    var regex = /(\d{4}\/\d{2}\/\d{2})\s(\d{2}:\d{2}:\d{2})/;
     var summaryDateTimeMatch = data.summary.match(regex);
-    var tasStartDate = summaryDateTimeMatch ? summaryDateTimeMatch[1] : data.tasStart;
-    var tasStartTime = summaryDateTimeMatch ? summaryDateTimeMatch[2] : data.tasStartTime;
+    var tasStartDate = summaryDateTimeMatch ? summaryDateTimeMatch[1] : '';
+    var tasStartTime = summaryDateTimeMatch ? summaryDateTimeMatch[2] : '';
 
     // Format data as Markdown
-    var markdownData = `${data.title}### Información del Ticket\n\n**Nombre:** ${data.name}\n**Fecha Inicio TAS:** ${tasStartDate}\n**Hora Inicio TAS:** ${tasStartTime}\n**Summary:** ${summary.trim()}\n**TAS:** ${data.tas}\n\n---\n\n**Mensaje:**\n${data.message}`;
+    var markdownData = `${data.title}### Información del Ticket\n\n**Nombre:** ${data.name}\n**Fecha Inicio TAS:** ${tasStartDate}\n**Hora Inicio TAS:** ${tasStartTime}\n**Summary:** ${data.summary}\n**TAS:** ${data.tas}\n\n---\n\n**Mensaje:**\n${data.message}`;
 
     // Create a new JSZip instance
     var zip = new JSZip();
@@ -60,7 +63,7 @@ function createZip() {
 
 function extractTASDateTime() {
     var summary = document.getElementById('summary').value;
-    var regex = /(\d{4}\/\d{2}\/\d{2}\s)(\d{2}:\d{2}:\d{2})/;
+    var regex = /(\d{4}\/\d{2}\/\d{2})\s(\d{2}:\d{2}:\d{2})/;
     var summaryDateTimeMatch = summary.match(regex);
     if (summaryDateTimeMatch) {
         document.getElementById('tasStart').value = summaryDateTimeMatch[1];
@@ -80,30 +83,49 @@ function autoFillTASPrefix() {
 </script>
 </head>
 <body>
-<h1>Remedy Folder TICKET GENERATOR:</h1>
-<form id="dataForm">
-    <label for="name">Nombre:</label><br>
-    <input type="text" id="name" name="name" required><br>
-    <label for="summary">Summary:</label><br>
-    <textarea id="summary" name="summary" onchange="extractTASDateTime()" required></textarea><br>
-    <label for="tasStart">Fecha Inicio TAS (Opcional):</label><br>
-    <input type="date" id="tasStart" name="tasStart"><br>
-    <label for="tasStartTime">Hora Inicio TAS (Opcional):</label><br>
-    <input type="time" id="tasStartTime" name="tasStartTime"><br>
-    <label for="tas">TAS:</label><br>
-    <input type="text" id="tas" name="tas" onchange="autoFillTASPrefix()"><br>
-    <label for="tasPrefix">Prefijo TAS:</label><br>
-    <select id="tasPrefix" name="tasPrefix">
-        <option value="">Seleccionar</option>
-        <option value="TAS">TAS</option>
-        <option value="CRQ">CRQ</option>
-        <option value="WO">WO</option>
-        <option value="INC">INC</option>
-    </select><br>
-    <label for="message">Mensaje:</label><br>
-    <textarea id="message" name="message"></textarea><br><br>
-    <input type="button" value="Enviar" onclick="createZip()">
-</form>
-
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <h1 class="text-center">Remedy Folder TICKET GENERATOR</h1>
+            <form id="dataForm">
+                <div class="form-group">
+                    <label for="name">Nombre:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="summary">Summary:</label>
+                    <textarea class="form-control" id="summary" name="summary" onchange="extractTASDateTime()" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="tasStart">Fecha Inicio TAS (Opcional):</label>
+                    <input type="date" class="form-control" id="tasStart" name="tasStart">
+                </div>
+                <div class="form-group">
+                    <label for="tasStartTime">Hora Inicio TAS (Opcional):</label>
+                    <input type="time" class="form-control" id="tasStartTime" name="tasStartTime">
+                </div>
+                <div class="form-group">
+                    <label for="tas">TAS:</label>
+                    <input type="text" class="form-control" id="tas" name="tas" onchange="autoFillTASPrefix()">
+                </div>
+                <div class="form-group">
+                    <label for="tasPrefix">Prefijo TAS:</label>
+                    <select class="form-control" id="tasPrefix" name="tasPrefix">
+                        <option value="">Seleccionar</option>
+                        <option value="TAS">TAS</option>
+                        <option value="CRQ">CRQ</option>
+                        <option value="WO">WO</option>
+                        <option value="INC">INC</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensaje:</label>
+                    <textarea class="form-control" id="message" name="message"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" onclick="createZip()">Enviar</button>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
