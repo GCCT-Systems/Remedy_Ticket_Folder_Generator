@@ -1,131 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guardar Datos en Archivo Markdown</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-function createZip() {
-    // Get form data
-    var data = {
-        title: "# REMEDY FOLDER TICKET GENERATOR\n\n",
-        name: document.getElementById('name').value,
-        summary: document.getElementById('summary').value,
-        tasStart: document.getElementById('tasStart').value,
-        tasStartTime: document.getElementById('tasStartTime').value,
-        tas: document.getElementById('tas').value,
-        message: document.getElementById('message').value
-    };
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardar Datos en Archivo Markdown</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <!-- Corrección de la URL de Bootstrap 5.0.2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    // Extract date and time from summary using regex
-    var regex = /(\d{4}\/\d{2}\/\d{2})\s(\d{2}:\d{2}:\d{2})/;
-    var summaryDateTimeMatch = data.summary.match(regex);
-    var tasStartDate = summaryDateTimeMatch ? summaryDateTimeMatch[1] : '';
-    var tasStartTime = summaryDateTimeMatch ? summaryDateTimeMatch[2] : '';
+    <script>
+        function createZip() {
+            var data = {
+                title: "# REMEDY FOLDER TICKET GENERATOR\n\n",
+                name: document.getElementById('name').value,
+                summary: document.getElementById('summary').value,
+                tasStart: document.getElementById('tasStart').value,
+                tasStartTime: document.getElementById('tasStartTime').value,
+                tas: document.getElementById('tas').value,
+                message: document.getElementById('message').value
+            };
 
-    // Format data as Markdown
-    var markdownData = `${data.title}### Información del Ticket\n\n**Nombre:** ${data.name}\n**Fecha Inicio TAS:** ${tasStartDate}\n**Hora Inicio TAS:** ${tasStartTime}\n**Summary:** ${data.summary}\n**TAS:** ${data.tas}\n\n---\n\n**Mensaje:**\n${data.message}`;
+            var regex = /(\d{4}\/\d{2}\/\d{2})\s(\d{2}:\d{2}:\d{2})/;
+            var summaryDateTimeMatch = data.summary.match(regex);
+            var tasStartDate = summaryDateTimeMatch ? summaryDateTimeMatch[1] : '';
+            var tasStartTime = summaryDateTimeMatch ? summaryDateTimeMatch[2] : '';
 
-    // Create a new JSZip instance
-    var zip = new JSZip();
+            var markdownData = `${data.title}### Información del Ticket\n\n**Nombre:** ${data.name}\n**Fecha Inicio TAS:** ${tasStartDate}\n**Hora Inicio TAS:** ${tasStartTime}\n**Summary:** ${data.summary}\n**TAS:** ${data.tas}\n\n---\n\n**Mensaje:**\n${data.message}`;
 
-    // Create a folder
-    var folder = zip.folder(`${data.tas}`);
+            var zip = new JSZip();
+            var folder = zip.folder(`${data.tas}`);
+            folder.file(`${data.tas}.md`, markdownData);
 
-    // Add Markdown file to the folder
-    folder.file(`${data.tas}.md`, markdownData);
+            zip.generateAsync({ type: "blob" })
+                .then(function (content) {
+                    var a = document.createElement("a");
+                    a.download = `${tasStartDate}_${data.tas}.zip`;
+                    a.href = window.URL.createObjectURL(content);
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                });
+        }
 
-    // Generate the zip file asynchronously
-    zip.generateAsync({type:"blob"})
-    .then(function(content) {
-        // Create a link element
-        var a = document.createElement("a");
+        function extractTASDateTime() {
+            var summary = document.getElementById('summary').value;
+            var regex = /(\d{4})\/(\d{2})\/(\d{2})\s(\d{2}:\d{2}:\d{2})/;
+            var summaryDateTimeMatch = summary.match(regex);
+            if (summaryDateTimeMatch) {
+                var tasStartDate = `${summaryDateTimeMatch[1]}-${summaryDateTimeMatch[2]}-${summaryDateTimeMatch[3]}`; // Formato yyyy-MM-dd
+                var tasStartTime = summaryDateTimeMatch[4];
+                document.getElementById('tasStart').value = tasStartDate;
+                document.getElementById('tasStartTime').value = tasStartTime;
+            }
+        }
 
-        // Set link's attributes including the file name
-        a.download = `${tasStartDate}_${data.tas}.zip`;
-        a.href = window.URL.createObjectURL(content);
-
-        // Append the link to the body
-        document.body.appendChild(a);
-
-        // Click the link to trigger the download
-        a.click();
-
-        // Cleanup
-        document.body.removeChild(a);
-    });
-}
-
-function extractTASDateTime() {
-    var summary = document.getElementById('summary').value;
-    var regex = /(\d{4}\/\d{2}\/\d{2})\s(\d{2}:\d{2}:\d{2})/;
-    var summaryDateTimeMatch = summary.match(regex);
-    if (summaryDateTimeMatch) {
-        document.getElementById('tasStart').value = summaryDateTimeMatch[1];
-        document.getElementById('tasStartTime').value = summaryDateTimeMatch[2];
-    }
-}
-
-function autoFillTASPrefix() {
-    var tasInput = document.getElementById('tas').value;
-    var tasPrefix = tasInput.substring(0, 3).toUpperCase();
-    if (tasPrefix === 'TAS' || tasPrefix === 'CRQ' || tasPrefix === 'WO' || tasPrefix === 'INC') {
-        document.getElementById('tasPrefix').value = tasPrefix;
-    } else {
-        document.getElementById('tasPrefix').value = '';
-    }
-}
-</script>
+        function autoFillTASPrefix() {
+            var tasInput = document.getElementById('tas').value;
+            var tasPrefix = tasInput.substring(0, 3).toUpperCase();
+            document.getElementById('tasPrefix').value = ['TAS', 'CRQ', 'WO', 'INC'].includes(tasPrefix) ? tasPrefix : '';
+        }
+    </script>
 </head>
+
 <body>
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-6">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
             <h1 class="text-center">Remedy Folder TICKET GENERATOR</h1>
-            <form id="dataForm">
-                <div class="form-group">
-                    <label for="name">Nombre:</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+            <div class="row g-2">
+                <div class="col-md">
+                  <div class="form-floating">
+                    <input type="email" class="form-control" id="floatingInputGrid" placeholder="name@example.com" value="mdo@example.com">
+                    <label for="floatingInputGrid">Email address</label>
+                  </div>
                 </div>
-                <div class="form-group">
-                    <label for="summary">Summary:</label>
-                    <textarea class="form-control" id="summary" name="summary" onchange="extractTASDateTime()" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="tasStart">Fecha Inicio TAS (Opcional):</label>
-                    <input type="date" class="form-control" id="tasStart" name="tasStart">
-                </div>
-                <div class="form-group">
-                    <label for="tasStartTime">Hora Inicio TAS (Opcional):</label>
-                    <input type="time" class="form-control" id="tasStartTime" name="tasStartTime">
-                </div>
-                <div class="form-group">
-                    <label for="tas">TAS:</label>
-                    <input type="text" class="form-control" id="tas" name="tas" onchange="autoFillTASPrefix()">
-                </div>
-                <div class="form-group">
-                    <label for="tasPrefix">Prefijo TAS:</label>
-                    <select class="form-control" id="tasPrefix" name="tasPrefix">
-                        <option value="">Seleccionar</option>
-                        <option value="TAS">TAS</option>
-                        <option value="CRQ">CRQ</option>
-                        <option value="WO">WO</option>
-                        <option value="INC">INC</option>
+                <div class="col-md">
+                  <div class="form-floating">
+                    <select class="form-select" id="floatingSelectGrid">
+                      <option selected>Open this select menu</option>
+                      <option value="1">One</option>
+                      <option value="2">Two</option>
+                      <option value="3">Three</option>
                     </select>
+                    <label for="floatingSelectGrid">Works with selects</label>
+                  </div>
                 </div>
-                <div class="form-group">
-                    <label for="message">Mensaje:</label>
-                    <textarea class="form-control" id="message" name="message"></textarea>
-                </div>
-                <button type="button" class="btn btn-primary btn-block" onclick="createZip()">Enviar</button>
-            </form>
+              </div>
+            <div class="col-md-6">
+                <form id="dataForm">
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="summary">Summary:</label>
+                        <textarea class="form-control" id="summary" name="summary" onchange="extractTASDateTime()"
+                            required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="tasStart">Fecha Inicio TAS (Opcional):</label>
+                        <input type="date" class="form-control" id="tasStart" name="tasStart">
+                    </div>
+                    <div class="form-group">
+                        <label for="tasStartTime">Hora Inicio TAS (Opcional):</label>
+                        <input type="time" class="form-control" id="tasStartTime" name="tasStartTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="tas">TAS:</label>
+                        <input type="text" class="form-control" id="tas" name="tas" onchange="autoFillTASPrefix()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tasPrefix">Prefijo TAS:</label>
+                        <select class="form-control" id="tasPrefix" name="tasPrefix">
+                            <option value="">Seleccionar</option>
+                            <option value="TAS">TAS</option>
+                            <option value="CRQ">CRQ</option>
+                            <option value="WO">WO</option>
+                            <option value="INC">INC</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje:</label>
+                        <textarea class="form-control" id="message" name="message"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block" onclick="createZip()">Enviar</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>
