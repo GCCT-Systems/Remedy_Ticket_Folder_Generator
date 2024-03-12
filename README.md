@@ -16,7 +16,7 @@ Automation ticketing
 - Al usar ya Bootstrap, algo visual bonito sin perder funcionalidad que es lo que buscamos, no digo colores, sino espaciado, etc.
 - Ponemos menú? qué contendría este?
 
-\\
+
 
 ## CLONING REPO
 ```
