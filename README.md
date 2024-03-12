@@ -20,4 +20,19 @@ Automation ticketing
 
 MIT License
 
-[PREVISUALIZACION](https://gcct-systems.github.io/Remedy_Ticket_Folder_Generator/)
+[PREVISUALIZACION-WEB](https://gcct-systems.github.io/Remedy_Ticket_Folder_Generator/)
+
+
+## CLONING REPO
+```
+git clone https://github.com/GCCT-Systems/Remedy_Ticket_Folder_Generator.git .
+
+### Deploying
+```
+git add .
+
+```
+git commit -m 'commentsForCommit'
+
+```
+git push origin master
