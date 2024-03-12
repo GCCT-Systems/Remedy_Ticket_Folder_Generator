@@ -10,14 +10,14 @@ Automation ticketing
 #### BRAINSTORMING
 
 - Al copiar el nombre del ticket se ponga automaticamente si es TAS, WO, etc y que se estructure el fichero a descargar adecuadamente
-- ![alt text](image.png)
+![alt text](image.png)
 
   
 - Al usar ya Bootstrap, algo visual bonito sin perder funcionalidad que es lo que buscamos, no digo colores, sino espaciado, etc.
 - Ponemos menú? qué contendría este?
 
-
-
+\\
+\\
 
 ## CLONING REPO
 ```
