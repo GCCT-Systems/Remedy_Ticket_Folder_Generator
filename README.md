@@ -16,11 +16,7 @@ Automation ticketing
 - Al usar ya Bootstrap, algo visual bonito sin perder funcionalidad que es lo que buscamos, no digo colores, sino espaciado, etc.
 - Ponemos menú? qué contendría este?
 
-# LICENSE
 
-MIT License
-
-[PREVISUALIZACION-WEB](https://gcct-systems.github.io/Remedy_Ticket_Folder_Generator/)
 
 
 ## CLONING REPO
@@ -34,3 +30,12 @@ git add .
 git commit -m 'commentsForCommit'
 
 git push origin master
+
+
+
+
+# LICENSE
+
+MIT License
+
+[PREVISUALIZACION-WEB](https://gcct-systems.github.io/Remedy_Ticket_Folder_Generator/)
